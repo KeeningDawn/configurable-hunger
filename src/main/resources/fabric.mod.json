@@ -1,0 +1,38 @@
+{
+	"schemaVersion": 1,
+	"id": "hunger-in-peace",
+	"version": "${version}",
+	"name": "Hunger in Peace",
+	"description": "This is an example description! Tell everyone what your mod is about!",
+	"authors": [
+		"Me!"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "GPL-3.0-or-later",
+	"icon": "assets/hunger-in-peace/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"io.github.keeningdawn.hungerinpeace.HungerInPeace"
+		],
+		"client": [
+			"io.github.keeningdawn.hungerinpeace.client.HungerInPeaceClient"
+		]
+	},
+	"mixins": [
+		"hunger-in-peace.mixins.json",
+		{
+			"config": "hunger-in-peace.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.19.3",
+		"minecraft": "~26.2",
+		"java": ">=25",
+		"fabric-api": "*"
+	}
+}
