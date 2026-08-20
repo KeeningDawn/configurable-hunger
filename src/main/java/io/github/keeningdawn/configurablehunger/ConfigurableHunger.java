@@ -14,15 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package io.github.keeningdawn.hungerinpeace;
+package io.github.keeningdawn.configurablehunger;
 
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.resources.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class HungerInPeace implements ModInitializer {
-  public static final String MOD_ID = "hunger-in-peace";
+public class ConfigurableHunger implements ModInitializer {
+  public static final String MOD_ID = "configurable-hunger";
 
   // This logger is used to write text to the console and the log file.
   // It is considered best practice to use your mod id as the logger's name.

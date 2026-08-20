@@ -10,4 +10,4 @@ pluginManagement {
 }
 
 // Should match your modid
-rootProject.name = 'hunger-in-peace'
+rootProject.name = 'configurable-hunger'

@@ -14,18 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package io.github.keeningdawn.hungerinpeace.client.mixin;
+package io.github.keeningdawn.configurablehunger.client;
 
-import net.minecraft.client.Minecraft;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import net.fabricmc.api.ClientModInitializer;
 
-@Mixin(Minecraft.class)
-public class ExampleClientMixin {
-  @Inject(at = @At("HEAD"), method = "run")
-  private void init(CallbackInfo info) {
-    // This code is injected into the start of Minecraft.run()V
+public class ConfigurableHungerClient implements ClientModInitializer {
+  @Override
+  public void onInitializeClient() {
+    // This entrypoint is suitable for setting up client-specific logic, such as rendering.
   }
 }

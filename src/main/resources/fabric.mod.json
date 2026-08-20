@@ -1,8 +1,8 @@
 {
 	"schemaVersion": 1,
-	"id": "hunger-in-peace",
+	"id": "configurable-hunger",
 	"version": "${version}",
-	"name": "Hunger in Peace",
+	"name": "Configurable Hunger",
 	"description": "This is an example description! Tell everyone what your mod is about!",
 	"authors": [
 		"Me!"
@@ -12,20 +12,20 @@
 		"sources": "https://github.com/FabricMC/fabric-example-mod"
 	},
 	"license": "GPL-3.0-or-later",
-	"icon": "assets/hunger-in-peace/icon.png",
+	"icon": "assets/configurable-hunger/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"io.github.keeningdawn.hungerinpeace.HungerInPeace"
+			"io.github.keeningdawn.configurablehunger.ConfigurableHunger"
 		],
 		"client": [
-			"io.github.keeningdawn.hungerinpeace.client.HungerInPeaceClient"
+			"io.github.keeningdawn.configurablehunger.client.ConfigurableHungerClient"
 		]
 	},
 	"mixins": [
-		"hunger-in-peace.mixins.json",
+		"configurable-hunger.mixins.json",
 		{
-			"config": "hunger-in-peace.client.mixins.json",
+			"config": "configurable-hunger.client.mixins.json",
 			"environment": "client"
 		}
 	],

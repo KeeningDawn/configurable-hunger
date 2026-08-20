@@ -1,4 +1,4 @@
-# Hunger in Peace
+# Configurable Hunger
 
 ## Setup
 
