@@ -3,13 +3,13 @@
 	"id": "configurable-hunger",
 	"version": "${version}",
 	"name": "Configurable Hunger",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "Allows you to take control of hunger mechanics, decoupling hunger difficulty from world difficulty.",
 	"authors": [
-		"Me!"
+		"KeeningDawn"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"issues": "https://github.com/KeeningDawn/configurable-hunger/issues",
+		"sources": "https://github.com/KeeningDawn/configurable-hunger"
 	},
 	"license": "GPL-3.0-or-later",
 	"icon": "assets/configurable-hunger/icon.png",
@@ -20,19 +20,22 @@
 		],
 		"client": [
 			"io.github.keeningdawn.configurablehunger.client.ConfigurableHungerClient"
+		],
+		"modmenu": [
+			"io.github.keeningdawn.configurablehunger.client.ConfigurableHungerModMenuIntegration"
 		]
 	},
 	"mixins": [
-		"configurable-hunger.mixins.json",
-		{
-			"config": "configurable-hunger.client.mixins.json",
-			"environment": "client"
-		}
+		"configurable-hunger.mixins.json"
 	],
 	"depends": {
 		"fabricloader": ">=0.19.3",
 		"minecraft": "~26.2",
 		"java": ">=25",
 		"fabric-api": "*"
+	},
+	"suggests": {
+		"modmenu": "*",
+		"cloth-config": "*"
 	}
 }

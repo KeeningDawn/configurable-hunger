@@ -14,18 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package io.github.keeningdawn.configurablehunger.mixin;
+package io.github.keeningdawn.configurablehunger.config;
 
-import net.minecraft.server.MinecraftServer;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-@Mixin(MinecraftServer.class)
-public class ExampleMixin {
-  @Inject(at = @At("HEAD"), method = "loadLevel")
-  private void init(CallbackInfo info) {
-    // This code is injected into the start of MinecraftServer.loadLevel()V
-  }
+public enum StarvationDifficulty {
+  PEACEFUL,
+  EASY,
+  NORMAL,
+  HARD
 }
