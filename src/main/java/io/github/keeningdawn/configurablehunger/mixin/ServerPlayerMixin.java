@@ -47,17 +47,9 @@ public class ServerPlayerMixin {
       return;
     }
 
-    if (self.tickCount % 20 == 0) {
-      if (self.getHealth() < self.getMaxHealth()) {
-        self.heal(1.0f);
-      }
-      float saturation = self.getFoodData().getSaturationLevel();
-      if (saturation < 20.0f) {
-        self.getFoodData().setSaturation(saturation + 1.0f);
-      }
-    }
-    if (self.tickCount % 10 == 0 && self.getFoodData().needsFood()) {
-      self.getFoodData().setFoodLevel(self.getFoodData().getFoodLevel() + 1);
+    // health only
+    if (self.tickCount % 20 == 0 && self.getHealth() < self.getMaxHealth()) {
+      self.heal(1.0f);
     }
   }
 
