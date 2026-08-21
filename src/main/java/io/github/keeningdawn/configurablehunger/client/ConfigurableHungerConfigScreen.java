@@ -16,8 +16,6 @@
  */
 package io.github.keeningdawn.configurablehunger.client;
 
-import com.terraformersmc.modmenu.api.ConfigScreenFactory;
-import com.terraformersmc.modmenu.api.ModMenuApi;
 import io.github.keeningdawn.configurablehunger.config.ConfigurableHungerConfig;
 import io.github.keeningdawn.configurablehunger.config.PeacefulRegeneration;
 import io.github.keeningdawn.configurablehunger.config.StarvationDifficulty;
@@ -25,74 +23,74 @@ import java.util.Optional;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
-import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.fml.ModList;
 
-public class ConfigurableHungerModMenuIntegration implements ModMenuApi {
-  @Override
-  public ConfigScreenFactory<?> getModConfigScreenFactory() {
-    // Cloth Config is an optional dependency, no config screen without it.
-    if (!FabricLoader.getInstance().isModLoaded("cloth-config")) {
-      return null;
-    }
-    return parent -> {
-      ConfigurableHungerConfig config = ConfigurableHungerConfig.get();
+@OnlyIn(Dist.CLIENT)
+public class ConfigurableHungerConfigScreen {
+  static boolean isClothConfigLoaded() {
+    return ModList.get().isLoaded("cloth_config");
+  }
 
-      ConfigBuilder builder =
-          ConfigBuilder.create()
-              .setParentScreen(parent)
-              .setTitle(Component.translatable("title.configurable-hunger.config"))
-              .solidBackground()
-              .setSavingRunnable(config::save);
+  static Screen build(Screen parent) {
+    ConfigurableHungerConfig config = ConfigurableHungerConfig.get();
 
-      ConfigCategory general =
-          builder.getOrCreateCategory(
-              Component.translatable("category.configurable-hunger.general"));
-      ConfigEntryBuilder entryBuilder = builder.entryBuilder();
+    ConfigBuilder builder =
+        ConfigBuilder.create()
+            .setParentScreen(parent)
+            .setTitle(Component.translatable("title.configurable-hunger.config"))
+            .solidBackground()
+            .setSavingRunnable(config::save);
 
-      general.addEntry(
-          entryBuilder
-              .startBooleanToggle(
-                  Component.translatable("option.configurable-hunger.enabled"), config.enabled)
-              .setDefaultValue(true)
-              .setSaveConsumer(value -> config.enabled = value)
-              .build());
+    ConfigCategory general =
+        builder.getOrCreateCategory(Component.translatable("category.configurable-hunger.general"));
+    ConfigEntryBuilder entryBuilder = builder.entryBuilder();
 
-      general.addEntry(
-          entryBuilder
-              .startBooleanToggle(
-                  Component.translatable("option.configurable-hunger.deplete_hunger"),
-                  config.depleteHunger)
-              .setDefaultValue(true)
-              .setSaveConsumer(value -> config.depleteHunger = value)
-              .build());
+    general.addEntry(
+        entryBuilder
+            .startBooleanToggle(
+                Component.translatable("option.configurable-hunger.enabled"), config.enabled)
+            .setDefaultValue(true)
+            .setSaveConsumer(value -> config.enabled = value)
+            .build());
 
-      general.addEntry(
-          entryBuilder
-              .startEnumSelector(
-                  Component.translatable("option.configurable-hunger.starvation_difficulty"),
-                  StarvationDifficulty.class,
-                  config.starvationDifficulty)
-              .setDefaultValue(StarvationDifficulty.NORMAL)
-              .setEnumNameProvider(value -> starvationDifficultyName((StarvationDifficulty) value))
-              .setTooltipSupplier(ConfigurableHungerModMenuIntegration::starvationDifficultyTooltip)
-              .setSaveConsumer(value -> config.starvationDifficulty = value)
-              .build());
+    general.addEntry(
+        entryBuilder
+            .startBooleanToggle(
+                Component.translatable("option.configurable-hunger.deplete_hunger"),
+                config.depleteHunger)
+            .setDefaultValue(true)
+            .setSaveConsumer(value -> config.depleteHunger = value)
+            .build());
 
-      general.addEntry(
-          entryBuilder
-              .startEnumSelector(
-                  Component.translatable("option.configurable-hunger.peaceful_regeneration"),
-                  PeacefulRegeneration.class,
-                  config.peacefulRegeneration)
-              .setDefaultValue(PeacefulRegeneration.NEVER)
-              .setEnumNameProvider(value -> peacefulRegenerationName((PeacefulRegeneration) value))
-              .setTooltipSupplier(ConfigurableHungerModMenuIntegration::peacefulRegenerationTooltip)
-              .setSaveConsumer(value -> config.peacefulRegeneration = value)
-              .build());
+    general.addEntry(
+        entryBuilder
+            .startEnumSelector(
+                Component.translatable("option.configurable-hunger.starvation_difficulty"),
+                StarvationDifficulty.class,
+                config.starvationDifficulty)
+            .setDefaultValue(StarvationDifficulty.NORMAL)
+            .setEnumNameProvider(value -> starvationDifficultyName((StarvationDifficulty) value))
+            .setTooltipSupplier(ConfigurableHungerConfigScreen::starvationDifficultyTooltip)
+            .setSaveConsumer(value -> config.starvationDifficulty = value)
+            .build());
 
-      return builder.build();
-    };
+    general.addEntry(
+        entryBuilder
+            .startEnumSelector(
+                Component.translatable("option.configurable-hunger.peaceful_regeneration"),
+                PeacefulRegeneration.class,
+                config.peacefulRegeneration)
+            .setDefaultValue(PeacefulRegeneration.NEVER)
+            .setEnumNameProvider(value -> peacefulRegenerationName((PeacefulRegeneration) value))
+            .setTooltipSupplier(ConfigurableHungerConfigScreen::peacefulRegenerationTooltip)
+            .setSaveConsumer(value -> config.peacefulRegeneration = value)
+            .build());
+
+    return builder.build();
   }
 
   private static Component starvationDifficultyName(StarvationDifficulty value) {

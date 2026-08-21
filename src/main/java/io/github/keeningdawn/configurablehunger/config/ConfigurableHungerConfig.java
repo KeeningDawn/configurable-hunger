@@ -22,13 +22,13 @@ import io.github.keeningdawn.configurablehunger.ConfigurableHunger;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import net.fabricmc.loader.api.FabricLoader;
+import net.minecraftforge.fml.loading.FMLPaths;
 
 // Lives in common since this could be ran by a dedicated server.
 public class ConfigurableHungerConfig {
   private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
   private static final Path PATH =
-      FabricLoader.getInstance().getConfigDir().resolve(ConfigurableHunger.MOD_ID + ".json");
+      FMLPaths.CONFIGDIR.get().resolve(ConfigurableHunger.MOD_ID + ".json");
   private static ConfigurableHungerConfig instance;
 
   public boolean enabled = true;

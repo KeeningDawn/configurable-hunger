@@ -1,0 +1,38 @@
+modLoader="javafml" #mandatory
+loaderVersion="${loader_version_range}" #mandatory
+license="${mod_license}"
+issueTrackerURL="https://github.com/KeeningDawn/configurable-hunger/issues"
+displayURL="https://github.com/KeeningDawn/configurable-hunger"
+
+[[mods]] #mandatory
+modId="${mod_id}" #mandatory
+version="${mod_version}" #mandatory
+displayName="${mod_name}" #mandatory
+authors="${mod_authors}" #optional
+description='''${mod_description}'''
+logoFile="assets/configurable-hunger/icon.png"
+
+[[dependencies.${mod_id}]]
+	modId="forge"
+	mandatory=true
+	versionRange="${forge_version_range}"
+	ordering="NONE"
+	side="BOTH"
+
+[[dependencies.${mod_id}]]
+	modId="minecraft"
+	mandatory=true
+	versionRange="${minecraft_version_range}"
+	ordering="NONE"
+	side="BOTH"
+
+# Cloth Config is an optional dependency, only needed for the in-game config screen.
+[[dependencies.${mod_id}]]
+	modId="cloth_config"
+	mandatory=false
+	versionRange="[${cloth_config_version},)"
+	ordering="NONE"
+	side="CLIENT"
+
+# Add mixinConfigs to enable SpongePowered Mixin
+mixinConfigs = "${mod_id}.mixins.json"
