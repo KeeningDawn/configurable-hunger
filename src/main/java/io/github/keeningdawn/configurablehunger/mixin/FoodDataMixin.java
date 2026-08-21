@@ -61,6 +61,7 @@ public abstract class FoodDataMixin {
 
     if (naturalRegen && saturationLevel > 0.0f && player.isHurt() && foodLevel >= 20) {
       tickTimer++;
+      // vanilla has a 10 tick delay, if not emulated it will be practically instant
       if (tickTimer >= 10) {
         float amount = Math.min(saturationLevel, 6.0f);
         player.heal(amount / 6.0f);
