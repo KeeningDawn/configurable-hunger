@@ -60,10 +60,13 @@ public abstract class FoodDataMixin {
     }
 
     if (naturalRegen && saturationLevel > 0.0f && player.isHurt() && foodLevel >= 20) {
-      float amount = Math.min(saturationLevel, 6.0f);
-      player.heal(amount / 6.0f);
-      addExhaustion(amount);
-      tickTimer = 0;
+      tickTimer++;
+      if (tickTimer >= 10) {
+        float amount = Math.min(saturationLevel, 6.0f);
+        player.heal(amount / 6.0f);
+        addExhaustion(amount);
+        tickTimer = 0;
+      }
     } else if (naturalRegen && foodLevel >= 18 && player.isHurt()) {
       tickTimer++;
       if (tickTimer >= 80) {
