@@ -16,30 +16,57 @@
  */
 package io.github.keeningdawn.configurablehunger.mixin;
 
+import io.github.keeningdawn.configurablehunger.ConfigurableHunger;
 import io.github.keeningdawn.configurablehunger.config.ConfigurableHungerConfig;
 import io.github.keeningdawn.configurablehunger.config.PeacefulRegeneration;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.gamerules.GameRules;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-// Server side logic
-@Mixin(ServerPlayer.class)
-public class ServerPlayerMixin {
-  @Inject(method = "tickRegeneration", at = @At("HEAD"), cancellable = true)
+// For some reason, unlike 26.2, vanilla's peaceful auto heal is inlined into Player#aiStep, not
+// split into its own ServerPlayer method. So we have to mix into Player instead of ServerPlayer.
+// Not removing this means a recurrent, constant desync that practically makes the mod unusable.
+@Mixin(Player.class)
+public abstract class PlayerMixin {
+
+  @Redirect(
+      method = "aiStep",
+      at =
+          @At(
+              value = "INVOKE",
+              target =
+                  "Lnet/minecraft/world/level/GameRules;getBoolean(Lnet/minecraft/world/level/GameRules$Key;)Z"))
+  // Client branch for the handshake, so we don't enable the mod on unsupported servers.
+  // See ConfigurableHunger for the client side of this branch.
+  private boolean configurableHunger$suppressVanillaPeacefulRegen(
+      GameRules gameRules, GameRules.Key<GameRules.BooleanValue> rule) {
+    boolean actual = gameRules.getBoolean(rule);
+    boolean suppress =
+        ((Object) this) instanceof ServerPlayer
+            ? ConfigurableHungerConfig.get().enabled
+            : ConfigurableHunger.serverRegenSuppressionActive;
+    return suppress ? false : actual;
+  }
+
+  @Inject(method = "aiStep", at = @At("HEAD"))
   private void configurableHunger$tickRegeneration(CallbackInfo ci) {
+    if (!(((Object) this) instanceof ServerPlayer self)) {
+      return;
+    }
+
     ConfigurableHungerConfig config = ConfigurableHungerConfig.get();
     if (!config.enabled) {
       return;
     }
-    ci.cancel();
 
-    ServerPlayer self = (ServerPlayer) (Object) this;
-    ServerLevel level = self.level();
-    if (!level.getGameRules().get(GameRules.NATURAL_HEALTH_REGENERATION)) {
+    Level level = self.level();
+    if (!level.getGameRules().getBoolean(GameRules.RULE_NATURAL_REGENERATION)) {
       return;
     }
 
@@ -58,9 +85,7 @@ public class ServerPlayerMixin {
     return switch (mode) {
       case NEVER -> false;
       case ALWAYS -> true;
-      case SPRINT_BASED ->
-          ((PlayerInvokerMixin) (Object) player)
-              .configurableHunger$hasEnoughFoodToDoExhaustiveManoeuvres();
+      case SPRINT_BASED -> player.getFoodData().getFoodLevel() > 6 || player.getAbilities().mayfly;
       case NATURAL_REGEN_BASED -> player.getFoodData().getFoodLevel() >= 18;
     };
   }

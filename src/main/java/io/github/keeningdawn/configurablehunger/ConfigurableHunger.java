@@ -18,7 +18,10 @@ package io.github.keeningdawn.configurablehunger;
 
 import io.github.keeningdawn.configurablehunger.config.ConfigurableHungerConfig;
 import net.fabricmc.api.ModInitializer;
-import net.minecraft.resources.Identifier;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,13 +30,25 @@ public class ConfigurableHunger implements ModInitializer {
 
   public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
+  // Server branch for the handshake, so we don't enable the mod on unsupported servers.
+  // See PlayerMixin for the client side of this branch.
+  public static final ResourceLocation REGEN_SUPPRESSION_CHANNEL = id("regen_suppression_active");
+  public static boolean serverRegenSuppressionActive = false;
+
   @Override
   public void onInitialize() {
     ConfigurableHungerConfig.load();
     LOGGER.info("Configurable Hunger initialized");
+
+    ServerPlayConnectionEvents.JOIN.register(
+        (handler, sender, server) -> {
+          FriendlyByteBuf buf = PacketByteBufs.create();
+          buf.writeBoolean(ConfigurableHungerConfig.get().enabled);
+          sender.sendPacket(REGEN_SUPPRESSION_CHANNEL, buf);
+        });
   }
 
-  public static Identifier id(String path) {
-    return Identifier.fromNamespaceAndPath(MOD_ID, path);
+  public static ResourceLocation id(String path) {
+    return new ResourceLocation(MOD_ID, path);
   }
 }

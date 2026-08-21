@@ -18,10 +18,10 @@ package io.github.keeningdawn.configurablehunger.mixin;
 
 import io.github.keeningdawn.configurablehunger.config.ConfigurableHungerConfig;
 import io.github.keeningdawn.configurablehunger.config.StarvationDifficulty;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodData;
-import net.minecraft.world.level.gamerules.GameRules;
+import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -40,15 +40,15 @@ public abstract class FoodDataMixin {
   public abstract void addExhaustion(float exhaustion);
 
   @Inject(method = "tick", at = @At("HEAD"), cancellable = true)
-  private void configurableHunger$tick(ServerPlayer player, CallbackInfo ci) {
+  private void configurableHunger$tick(Player player, CallbackInfo ci) {
     ConfigurableHungerConfig config = ConfigurableHungerConfig.get();
     if (!config.enabled) {
       return;
     }
     ci.cancel();
 
-    ServerLevel level = player.level();
-    boolean naturalRegen = level.getGameRules().get(GameRules.NATURAL_HEALTH_REGENERATION);
+    Level level = player.level();
+    boolean naturalRegen = level.getGameRules().getBoolean(GameRules.RULE_NATURAL_REGENERATION);
 
     if (exhaustionLevel > 4.0f) {
       exhaustionLevel -= 4.0f;
@@ -60,10 +60,14 @@ public abstract class FoodDataMixin {
     }
 
     if (naturalRegen && saturationLevel > 0.0f && player.isHurt() && foodLevel >= 20) {
-      float amount = Math.min(saturationLevel, 6.0f);
-      player.heal(amount / 6.0f);
-      addExhaustion(amount);
-      tickTimer = 0;
+      tickTimer++;
+      // vanilla has a 10 tick delay, if not emulated it will be practically instant
+      if (tickTimer >= 10) {
+        float amount = Math.min(saturationLevel, 6.0f);
+        player.heal(amount / 6.0f);
+        addExhaustion(amount);
+        tickTimer = 0;
+      }
     } else if (naturalRegen && foodLevel >= 18 && player.isHurt()) {
       tickTimer++;
       if (tickTimer >= 80) {
@@ -75,7 +79,7 @@ public abstract class FoodDataMixin {
       tickTimer++;
       if (tickTimer >= 80) {
         if (configurableHunger$shouldStarve(player, config.starvationDifficulty)) {
-          player.hurtServer(level, player.damageSources().starve(), 1.0f);
+          player.hurt(player.damageSources().starve(), 1.0f);
         }
         tickTimer = 0;
       }
@@ -85,7 +89,7 @@ public abstract class FoodDataMixin {
   }
 
   private static boolean configurableHunger$shouldStarve(
-      ServerPlayer player, StarvationDifficulty difficulty) {
+      Player player, StarvationDifficulty difficulty) {
     return switch (difficulty) {
       case PEACEFUL -> false;
       case EASY -> player.getHealth() > 10.0f;

@@ -16,11 +16,23 @@
  */
 package io.github.keeningdawn.configurablehunger.client;
 
+import io.github.keeningdawn.configurablehunger.ConfigurableHunger;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
 public class ConfigurableHungerClient implements ClientModInitializer {
   @Override
   public void onInitializeClient() {
-    // This entrypoint is suitable for setting up client-specific logic, such as rendering.
+    ClientPlayNetworking.registerGlobalReceiver(
+        ConfigurableHunger.REGEN_SUPPRESSION_CHANNEL,
+        (client, handler, buf, sender) -> {
+          boolean active = buf.readBoolean();
+          client.execute(() -> ConfigurableHunger.serverRegenSuppressionActive = active);
+        });
+
+    // Reset back to inactive on disconnect, so we dont get a stale state
+    ClientPlayConnectionEvents.DISCONNECT.register(
+        (handler, client) -> ConfigurableHunger.serverRegenSuppressionActive = false);
   }
 }
